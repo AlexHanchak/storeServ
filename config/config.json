@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "alex",
+    "password": "h4t8j6b2f5",
+    "database": "mydatabase",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "test": {
+    "username": "alex",
+    "password": "h4t8j6b2f5",
+    "database": "mydatabase",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "production": {
+    "username": "alex",
+    "password": "h4t8j6b2f5",
+    "database": "mydatabase",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  }
+}
