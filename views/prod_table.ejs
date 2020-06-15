@@ -1,0 +1,20 @@
+<table>
+    <h1 class="blue-text text-darken-2">Products</h1>
+    <thead>
+        <tr>
+            <td>Product Name</td>
+            <td>Product Price</td>
+            <td>Product Description</td>
+            <td>Product full view</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <% for( let i = 0; i<products.length; i++){%>
+            <td>
+                <%= product[i].product_name %>
+            </td>
+            <% }) %>
+        </tr>
+    </tbody>
+</table>

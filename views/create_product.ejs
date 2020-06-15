@@ -1,0 +1,22 @@
+
+<form class="m8 col s12">
+    <div class="row">
+        <div class="input-field col s6">
+            <input placeholder="Enter Product Name" id="prod_name" name="prod_name" type="text" class="validate">
+            <label for="prod_name">Product Name</label>
+        </div>
+        <div class="input-field col s6">
+            <input placeholder="Enter Product Description" id="prod_desc" name="prod_desc" type="text" class="validate">
+            <label for="prod_desc">Product Description</label>
+        </div>
+    </div>
+    <div>
+        <div class="input-field col s6">
+            <input placeholder="Enter Product Price" id="prod_price" name="prod_price" type="number" class="validate">
+            <label for="prod_price">Product Price</label>
+        </div>
+    </div>
+    <button class="waves-effect waves-light btn" type="submit" formmethod="POST" formaction="/api/product">
+        Create Product
+    </button>
+</form>

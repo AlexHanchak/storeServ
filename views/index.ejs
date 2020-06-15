@@ -1,12 +1,27 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-    <a href=<%= url %>>Google</a>
-  </body>
+
+<head>
+  <title><%= title %></title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+
+<body>
+  <div class="row">
+    <div class="col s6"><%- include("signup.ejs") %></div>
+    <div class="col s6"><%- include("login.ejs") %></div>
+  </div>
+  <button class="waves-effect waves-light btn" type="submit" formmethod="POST" formaction="/api/logout">Logout</button>
+  <div>
+    <%- include("create_product.ejs") %>
+  </div>
+  <div>
+    <%- include("prod_table.ejs") %>
+  </div>
+
+
+</body>
+
 </html>

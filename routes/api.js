@@ -9,7 +9,7 @@ const User = require('../models').User;
 router.post('/signup', function(req, res) {
   console.log(req.body);
   if (!req.body.username || !req.body.password) {
-    res.status(400).send({msg: 'Please pass username and password.'})
+    res.status(400).send({msg: 'Please pass username and password.',})
   } else {
     User
       .create({
