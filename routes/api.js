@@ -58,7 +58,7 @@ router.get('/logout', function (req, res) {
   res.redirect('/');
 })
 
-router.get('/product', passport.authenticate('jwt', { session: false}), function(req, res) {
+router.get('/productAll', passport.authenticate('jwt', { session: true}), function(req, res) {
   let token = getToken(req.headers);
   if (token) {
     Product

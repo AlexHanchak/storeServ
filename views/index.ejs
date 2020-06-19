@@ -18,9 +18,10 @@
     <%- include("create_product.ejs") %>
   </div>
   <div>
-    <%- include("prod_table.ejs") %>
+    <% for (let c = 0; c<(products.length); c++) { %>
+      <p><%= JSON.stringify(products.prod_name) %> </p>
+    <% } %>
   </div>
-
 
 </body>
 
