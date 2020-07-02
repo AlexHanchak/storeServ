@@ -1,25 +1,22 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
+const { json } = require('sequelize');
 const router = express.Router();
-require('../config/passport')(passport);
 const Product = require('../models').Product;
 const User = require('../models').User;
 
-router.get('/', function (req, res, next) {
-    res.render('index', {
-      title: 'Store',
-      products: [Product
-        .findAll()
-        .then((products) => res.status(200).send(products))
-        .catch((error) => { res.status(400).send(error); })]
-    });
-  });
 
-router.post('/signup', function(req, res) {
+router.get('/', function (req, res, next) {
+  res.render('index', {
+    title: 'Store'
+  });
+});
+
+router.post('/signup', function (req, res) {
   console.log(req.body);
   if (!req.body.username || !req.body.password) {
-    res.status(400).send({msg: 'Please pass username and password.',})
+    res.status(400).send({ msg: 'Please pass username and password.', })
   } else {
     User
       .create({
@@ -34,33 +31,33 @@ router.post('/signup', function(req, res) {
   }
 });
 
-router.post('/signin', function(req, res) {
+router.post('/signin', function (req, res) {
   User
-      .find({
-        where: {
-          username: req.body.username
+    .find({
+      where: {
+        username: req.body.username
+      }
+    })
+    .then((user) => {
+      if (!user) {
+        return res.status(401).send({
+          message: 'Authentication failed. User not found.',
+        });
+      }
+      user.comparePassword(req.body.password, (err, isMatch) => {
+        if (isMatch && !err) {
+          let token = jwt.sign(JSON.parse(JSON.stringify(user)), 'nodeauthsecret', { expiresIn: 86400 * 30 });
+          jwt.verify(token, 'nodeauthsecret', function (err, data) {
+            console.log(err, data);
+            console.log(token);
+          })
+          res.json({ success: true, token: 'JWT ' + token });
+        } else {
+          res.status(401).send({ success: false, msg: 'Authentication failed. Wrong password.' });
         }
       })
-      .then((user) => {
-        if (!user) {
-          return res.status(401).send({
-            message: 'Authentication failed. User not found.',
-          });
-        }
-        user.comparePassword(req.body.password, (err, isMatch) => {
-          if(isMatch && !err) {
-            let token = jwt.sign(JSON.parse(JSON.stringify(user)), 'nodeauthsecret', {expiresIn: 86400 * 30});
-            jwt.verify(token, 'nodeauthsecret', function(err, data){
-              console.log(err, data);
-              console.log(token);
-            })
-            res.json({success: true, token: 'JWT ' + token});
-          } else {
-            res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
-          }
-        })
-      })
-      .catch((error) => res.status(400).send(error));
+    })
+    .catch((error) => res.status(400).send(error));
 });
 
 router.get('/logout', function (req, res) {
@@ -68,58 +65,55 @@ router.get('/logout', function (req, res) {
   res.redirect('/');
 })
 
-router.get('/productAll', passport.authenticate('jwt', { session: true}), function(req, res) {
+router.get('/productAll', (req, res, next) => {
+  Product.findAll().then((product) => {
+    res.render('prod_table.ejs', {
+      product: product
+    });
+  });
+});
+
+router.get('/product_sort', passport.authenticate('jwt', { session: false }), function (req, res) {
   let token = getToken(req.headers);
   if (token) {
     Product
-      .findAll()
+      .findAll({
+        order: [
+          ['prod_name', 'prod_desc', 'prod_price']
+        ]
+      })
       .then((products) => res.status(200).send(products))
       .catch((error) => { res.status(400).send(error); });
   } else {
-    return res.status(403).send({success: false, msg: 'Unauthorized.'});
+    return res.status(403).send({ success: false, msg: 'Unauthorized.' });
   }
 });
 
-router.get('/product_sort', passport.authenticate('jwt', { session: false}), function(req, res) {
-  let token = getToken(req.headers);
-  if (token){
-    Product
-        .findAll({order: [
-            ['prod_name', 'prod_desc', 'prod_price']
-          ]})
-        .then((products) => res.status(200).send(products))
-        .catch((error) => { res.status(400).send(error); });
-  } else {
-    return res.status(403).send({success: false, msg: 'Unauthorized.'});
-  }
-});
-
-router.get('/product_filter', passport.authenticate('jwt', {session:false}), function (req, res) {
-  let token = getToken(req.headers);
-  if (token){
-    Product
-        .findAll({where: prod_price in (150)})
-        .then((products) => res.status(200).send(products))
-        .catch((error) => { res.status(400).send(error); });
-  } else {
-    return res.status(403).send({success: false, msg: 'Unauthorized.'});
-  }
-});
-
-router.post('/product', passport.authenticate('jwt', { session: false}), function(req, res) {
+router.get('/product_filter', passport.authenticate('jwt', { session: false }), function (req, res) {
   let token = getToken(req.headers);
   if (token) {
     Product
-      .create({
-        prod_name: req.body.prod_name,
-        prod_desc: req.body.prod_desc,
-        prod_price: req.body.prod_price
-      })
-      .then((product) => res.status(201).send(product))
-      .catch((error) => res.status(400).send(error));
+      .findAll({ where: prod_price in (150) })
+      .then((products) => res.status(200).send(products))
+      .catch((error) => { res.status(400).send(error); });
   } else {
-    return res.status(403).send({success: false, msg: 'Unauthorized.'});
+    return res.status(403).send({ success: false, msg: 'Unauthorized.' });
   }
+});
+
+router.post('/product', (req, res) => {
+
+  Product
+    .create({
+      prod_name: req.body.prod_name,
+      prod_desc: req.body.prod_desc,
+      prod_price: req.body.prod_price
+    })
+    .then(() => {
+      res.redirect('/')
+    })
+    .catch((error) => res.status(400).send(error));
+
 });
 
 getToken = function (headers) {
